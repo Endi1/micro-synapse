@@ -1,0 +1,4 @@
+cradle:
+  stack:
+    - path: "./src/Main.hs"
+      component: "micro-synapse:exe:micro-synapse"
