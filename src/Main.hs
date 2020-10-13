@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
+import           Text.Printf
 import           Options.Applicative            ( (<**>)
                                                 , (<|>)
                                                 , fullDesc
@@ -24,6 +25,7 @@ import           System.Directory               ( createDirectory
 import           Data.Text                      ( Text
                                                 , pack
                                                 , unpack
+                                                , replace
                                                 )
 import qualified Data.Text.IO                  as DTIO
 import           CMark                          ( commonmarkToHtml )
@@ -55,22 +57,7 @@ data Note = Note {
   html :: Text
 } deriving Show
 
-parseLinks :: A.Parser Text
-parseLinks = do
-  A.takeTill (== '[')
-  parseLink <|> continue
- where
-  continue = do
-    A.char '['
-    parseLinks
 
-
-parseLink :: A.Parser Text
-parseLink = do
-  A.string "[["
-  link <- A.many1 A.letter
-  A.string "]]"
-  return $ pack link
 
 runServer :: IO ()
 runServer = do
@@ -115,13 +102,47 @@ buildNote :: FilePath -> IO Note
 buildNote notePath = do
   currentDir <- getCurrentDirectory
   noteRaw    <- DTIO.readFile (currentDir ++ "/" ++ notePath)
+  let noteHtml = commonmarkToHtml [] noteRaw
   return $ Note { title = getTitleFromPath notePath
                 , raw   = noteRaw
-                , html  = commonmarkToHtml [] noteRaw
+                , html  = parseInnerLinks noteHtml
                 }
  where
   getTitleFromPath :: FilePath -> Text
   getTitleFromPath = pack . reverse . drop 3 . reverse
+
+parseInnerLinks :: Text -> Text
+parseInnerLinks noteHtml =
+  let parseResult = A.parseOnly (A.many1 parseLinks) noteHtml
+  in  case parseResult of
+        Left  _           -> noteHtml
+        Right linkSymbols -> replaceLinks linkSymbols noteHtml
+ where
+  replaceLinks :: [Text] -> Text -> Text
+  replaceLinks []       noteHtml = noteHtml
+  replaceLinks (x : xs) noteHtml = replaceLinks xs $ replace
+    (pack (printf "[[%s]]" x :: String))
+    (pack (printf "<a href='%s.html'>%s</a>" x x :: String))
+    noteHtml
+
+
+
+parseLinks :: A.Parser Text
+parseLinks = do
+  A.takeTill (== '[')
+  parseLink <|> continue
+ where
+  continue = do
+    A.char '['
+    parseLinks
+
+
+parseLink :: A.Parser Text
+parseLink = do
+  A.string "[["
+  link <- A.many1 (A.letter <|> A.char '_')
+  A.string "]]"
+  return $ pack link
 
 getMarkdownFiles :: FilePath -> IO [FilePath]
 getMarkdownFiles currentDir = filter isMarkdownFile
