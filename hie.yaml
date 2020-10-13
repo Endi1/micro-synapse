@@ -2,3 +2,18 @@ cradle:
   stack:
     - path: "./src/Main.hs"
       component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Web.Server.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Cli.Commands.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Builder.Wiki.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Builder.Note.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Parser.Innerlinks.hs"
+      component: "micro-synapse:exe:micro-synapse"
