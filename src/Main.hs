@@ -2,6 +2,7 @@
 module Main where
 
 import           Options.Applicative            ( (<**>)
+                                                , (<|>)
                                                 , fullDesc
                                                 , help
                                                 , info
@@ -39,13 +40,14 @@ import           Happstack.Server               ( serveDirectory
                                                   , threadGroup
                                                   )
                                                 )
+import qualified Data.Attoparsec.Text          as A
 
 data Commands = Commands {
   new :: Bool,
   name :: String,
   build :: Bool,
   run :: Bool
-}
+} deriving Show
 
 data Note = Note {
   title :: Text,
@@ -53,8 +55,26 @@ data Note = Note {
   html :: Text
 } deriving Show
 
+parseLinks :: A.Parser Text
+parseLinks = do
+  A.takeTill (== '[')
+  parseLink <|> continue
+ where
+  continue = do
+    A.char '['
+    parseLinks
+
+
+parseLink :: A.Parser Text
+parseLink = do
+  A.string "[["
+  link <- A.many1 A.letter
+  A.string "]]"
+  return $ pack link
+
 runServer :: IO ()
 runServer = do
+  putStrLn "Running server on port 3000"
   buildWiki
   simpleHTTP Conf { port        = 3000
                   , validator   = Nothing
@@ -126,8 +146,7 @@ main = exec =<< execParser opts where
               (fullDesc <> progDesc "Build a wiki from your notes")
 
 exec :: Commands -> IO ()
--- exec (Commands False _ False False) = putStrLn "We're not creating a new note"
--- exec (Commands True filename _ _) =
---   putStrLn $ "Creating a note called " ++ filename
-exec (Commands _ _ _ True) = runServer
--- exec (Commands _     _ True False) = buildWiki
+exec (Commands True "" _    _    ) = putStrLn "Creating note with random title"
+exec (Commands True a  _    _    ) = putStrLn $ "Creating note called " ++ a
+exec (Commands _    _  True False) = buildWiki
+exec (Commands _    _  _    True ) = runServer

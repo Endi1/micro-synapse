@@ -25,4 +25,5 @@ executable micro-synapse
                        cmark,
                        yaml,
                        frontmatter,
-                       happstack-server
+                       happstack-server,
+                       attoparsec
