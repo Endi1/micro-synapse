@@ -31,4 +31,5 @@ executable micro-synapse
                        yaml,
                        frontmatter,
                        happstack-server,
-                       attoparsec
+                       attoparsec,
+                       fsnotify

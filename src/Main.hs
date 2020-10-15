@@ -16,11 +16,6 @@ import           Builder.Wiki                   ( buildWiki )
 import           Web.Server                     ( runServer )
 
 
-
-
-
-
-
 main :: IO ()
 main = exec =<< execParser opts where
   opts = info (commands <**> helper)
