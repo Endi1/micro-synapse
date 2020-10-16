@@ -32,4 +32,5 @@ executable micro-synapse
                        frontmatter,
                        happstack-server,
                        attoparsec,
-                       fsnotify
+                       fsnotify,
+                       lucid

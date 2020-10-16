@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Builder.Wiki
   ( buildWiki
   )
@@ -10,9 +11,22 @@ import           System.Directory               ( createDirectory
                                                 , removeDirectoryRecursive
                                                 )
 import           Data.Text                      ( unpack )
+import           Data.Text.Lazy                 ( toStrict )
 import           Builder.Note                   ( Note(..)
                                                 , buildNotes
                                                 )
+import           Text.Printf
+import           Lucid.Base
+import           Lucid.Html5
+
+template :: Note -> Html ()
+template note = html_ $ do
+  head_ $ do
+    title_ "Endi's Wiki"
+  body_ $ do
+    div_ [class_ "note"] $ do
+      toHtmlRaw $ html note
+
 
 
 buildWiki :: IO ()
@@ -34,7 +48,7 @@ writeToRes notes = do
   mapM_
     (\n -> DTIO.writeFile
       (currentDir ++ "/.res/" ++ unpack (title n) ++ ".html")
-      (html n)
+      (toStrict $ renderText $ template n)
     )
     notes
 
