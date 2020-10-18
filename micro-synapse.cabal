@@ -33,4 +33,5 @@ executable micro-synapse
                        happstack-server,
                        attoparsec,
                        fsnotify,
-                       lucid
+                       lucid,
+                       clay
