@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Builder.Tree
   ( buildTree
+  , getOrphans
   )
 where
 
@@ -10,10 +11,9 @@ import           Data.Text                      ( unpack
 import           Builder.Note                   ( Note(title, raw)
                                                 , buildNote
                                                 )
-import           Data.Tree                      ( Tree
-                                                , unfoldTreeM
-                                                )
+import           Data.Tree
 import           Parser.Innerlinks              ( parseInnerLinks )
+
 
 buildTree :: [Note] -> IO (Tree Text)
 buildTree allNotes =
@@ -25,3 +25,9 @@ buildChildrenFromNode currentNoteTitle = do
   currentNote <- buildNote (unpack currentNoteTitle ++ ".md")
   let currentNoteChildrenTitles = parseInnerLinks $ raw currentNote
   return (currentNoteTitle, currentNoteChildrenTitles)
+
+getOrphans :: Tree Text -> [Note] -> [Text]
+getOrphans tree allNotes =
+  let allNodes      = flatten tree
+      allNoteTitles = [ title n | n <- allNotes ]
+  in  filter (`notElem` allNodes) allNoteTitles

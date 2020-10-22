@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Builder.Wiki
   ( buildWiki
   )
@@ -12,104 +11,53 @@ import           System.Directory               ( createDirectory
                                                 )
 import           Data.Text                      ( unpack
                                                 , Text
-                                                , append
                                                 )
 import           Data.Text.Lazy                 ( toStrict )
 import           Builder.Note                   ( Note(..)
                                                 , buildNotes
                                                 )
-import           Lucid.Base
-import           Lucid.Html5
-import           Builder.Tree
-import           Data.Tree
+import           Lucid.Base                     ( renderText )
+import           Builder.Tree                   ( buildTree
+                                                , getOrphans
+                                                )
+import           Data.Tree                      ( Tree )
 
-import           Clay
+import           Clay                           ( render )
+import           Builder.Templating.Templates   ( noteTemplate
+                                                , treeTemplate
+                                                )
+import           Builder.Templating.Styling     ( pageStyle )
 
-primaryColor :: Color
-primaryColor = "#1947BD"
-
-blackColor :: Color
-blackColor = "#1E212B"
-
-dangerColor :: Color
-dangerColor = "#ED254E"
-
-successColor :: Color
-successColor = "#97CC04"
-
-containerCss :: Css
-containerCss = ".container" ? do
-  display flex
-  justifyContent center
-  marginLeft $ em 15
-  marginRight $ em 20
-
-styling :: Css
-styling = do
-  Clay.html ? do
-    color blackColor
-    fontSize $ px 20
-    fontFamily [] [sansSerif]
-    background (lighten 0.9 blackColor)
-  containerCss
-  ul ? do
-    listStyle none outside none
-  a ? do
-    textDecorationLine none
-    color primaryColor
-    ":hover" & do
-      color (lighten 0.5 primaryColor)
-
-template :: Note -> Html ()
-template note = html_ $ do
-  head_ $ do
-    title_ "Endi's Wiki"
-    link_ [rel_ "stylesheet", href_ "./style.css"]
-  body_ $ do
-    div_ [class_ "container"] $ do
-      div_ [class_ "note"] $ do
-        toHtmlRaw $ Builder.Note.html note
-
-treeTemplate :: Tree Text -> Html ()
-treeTemplate tree = html_ $ do
-  head_ $ do
-    title_ "Endi's Wiki - Tree"
-    link_ [rel_ "stylesheet", href_ "./style.css"]
-  body_ $ do
-    div_ [class_ "container"] $ do
-      div_ [class_ "tree"] $ do
-        ul_ $ do
-          treeToHtml tree
-
-
-treeToHtml :: Tree Text -> Html ()
-treeToHtml (Node x []) = do
-  li_ $ a_ [href_ (x `append` ".html")] $ toHtml x
-treeToHtml (Node x ts) = do
-  li_ $ a_ [href_ (x `append` ".html")] $ toHtml x
-  ul_ $ subtreesToHtml ts
- where
-  subtreesToHtml []       = ""
-  subtreesToHtml (t : ts) = do
-    treeToHtml t
-    subtreesToHtml ts
 
 buildWiki :: IO ()
 buildWiki = do
   markdownFiles <- getMarkdownFiles =<< getCurrentDirectory
   notes         <- buildNotes markdownFiles
   tree          <- buildTree notes
+  createRes
   writeNotesToRes notes
-  writeTreeToRes tree
+  writeTreeToRes tree (getOrphans tree notes)
 
-writeTreeToRes :: Tree Text -> IO ()
-writeTreeToRes tree = do
+writeTreeToRes :: Tree Text -> [Text] -> IO ()
+writeTreeToRes tree orphans = do
   currentDir <- getCurrentDirectory
   DTIO.writeFile (currentDir ++ "/.res/" ++ "tree.html")
-                 (toStrict $ renderText $ treeTemplate tree)
+                 (toStrict $ renderText $ treeTemplate tree orphans)
 
 writeNotesToRes :: [Note] -> IO ()
 writeNotesToRes notes = do
+  currentDir <- getCurrentDirectory
+  mapM_
+    (\n -> DTIO.writeFile
+      (currentDir ++ "/.res/" ++ unpack (Builder.Note.title n) ++ ".html")
+      (toStrict $ renderText $ noteTemplate n)
+    )
+    notes
+  DTIO.writeFile (currentDir ++ "/.res/" ++ "style.css")
+                 (toStrict $ render pageStyle)
+
+createRes :: IO ()
+createRes = do
   currentDir  <- getCurrentDirectory
   dirContents <- listDirectory currentDir
   if ".res" `elem` dirContents
@@ -117,14 +65,6 @@ writeNotesToRes notes = do
       removeDirectoryRecursive (currentDir ++ "/.res")
       createDirectory (currentDir ++ "/.res")
     else createDirectory (currentDir ++ "/.res")
-  mapM_
-    (\n -> DTIO.writeFile
-      (currentDir ++ "/.res/" ++ unpack (Builder.Note.title n) ++ ".html")
-      (toStrict $ renderText $ Builder.Wiki.template n)
-    )
-    notes
-  DTIO.writeFile (currentDir ++ "/.res/" ++ "style.css")
-                 (toStrict $ render styling)
 
 getMarkdownFiles :: FilePath -> IO [FilePath]
 getMarkdownFiles currentDir = Prelude.filter isMarkdownFile

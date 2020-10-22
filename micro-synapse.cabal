@@ -21,6 +21,7 @@ executable micro-synapse
                        Builder.Note,
                        Builder.Tree,
                        Builder.Templating.Templates
+                       Builder.Templating.Styling
                        Parser.Innerlinks
   main-is:             Main.hs
   default-language:    Haskell2010
