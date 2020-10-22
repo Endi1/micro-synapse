@@ -15,5 +15,8 @@ cradle:
     - path: "./src/Builder.Note.hs"
       component: "micro-synapse:exe:micro-synapse"
 
+    - path: "./src/Builder.Tree.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
     - path: "./src/Parser.Innerlinks.hs"
       component: "micro-synapse:exe:micro-synapse"

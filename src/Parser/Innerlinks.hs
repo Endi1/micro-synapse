@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Parser.Innerlinks
-  ( parseInnerLinks
+  ( parseInnerLinksToHtml
+  , parseInnerLinks
   )
 where
 
@@ -12,8 +13,15 @@ import qualified Data.Attoparsec.Text          as A
 import           Text.Printf                    ( printf )
 import           Options.Applicative            ( Alternative((<|>)) )
 
-parseInnerLinks :: Text -> Text
-parseInnerLinks noteHtml =
+parseInnerLinks :: Text -> [Text]
+parseInnerLinks noteRaw =
+  let parseResult = A.parseOnly (A.many1 parseLinks) noteRaw
+  in  case parseResult of
+        Left  _           -> []
+        Right linkSymbols -> linkSymbols
+
+parseInnerLinksToHtml :: Text -> Text
+parseInnerLinksToHtml noteHtml =
   let parseResult = A.parseOnly (A.many1 parseLinks) noteHtml
   in  case parseResult of
         Left  _           -> noteHtml

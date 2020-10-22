@@ -10,13 +10,18 @@ import           System.Directory               ( createDirectory
                                                 , listDirectory
                                                 , removeDirectoryRecursive
                                                 )
-import           Data.Text                      ( unpack )
+import           Data.Text                      ( unpack
+                                                , Text
+                                                , append
+                                                )
 import           Data.Text.Lazy                 ( toStrict )
 import           Builder.Note                   ( Note(..)
                                                 , buildNotes
                                                 )
 import           Lucid.Base
 import           Lucid.Html5
+import           Builder.Tree
+import           Data.Tree
 
 import           Clay
 
@@ -65,16 +70,46 @@ template note = html_ $ do
       div_ [class_ "note"] $ do
         toHtmlRaw $ Builder.Note.html note
 
+treeTemplate :: Tree Text -> Html ()
+treeTemplate tree = html_ $ do
+  head_ $ do
+    title_ "Endi's Wiki - Tree"
+    link_ [rel_ "stylesheet", href_ "./style.css"]
+  body_ $ do
+    div_ [class_ "container"] $ do
+      div_ [class_ "tree"] $ do
+        ul_ $ do
+          treeToHtml tree
 
+
+treeToHtml :: Tree Text -> Html ()
+treeToHtml (Node x []) = do
+  li_ $ a_ [href_ (x `append` ".html")] $ toHtml x
+treeToHtml (Node x ts) = do
+  li_ $ a_ [href_ (x `append` ".html")] $ toHtml x
+  ul_ $ subtreesToHtml ts
+ where
+  subtreesToHtml []       = ""
+  subtreesToHtml (t : ts) = do
+    treeToHtml t
+    subtreesToHtml ts
 
 buildWiki :: IO ()
 buildWiki = do
   markdownFiles <- getMarkdownFiles =<< getCurrentDirectory
   notes         <- buildNotes markdownFiles
-  writeToRes notes
+  tree          <- buildTree notes
+  writeNotesToRes notes
+  writeTreeToRes tree
 
-writeToRes :: [Note] -> IO ()
-writeToRes notes = do
+writeTreeToRes :: Tree Text -> IO ()
+writeTreeToRes tree = do
+  currentDir <- getCurrentDirectory
+  DTIO.writeFile (currentDir ++ "/.res/" ++ "tree.html")
+                 (toStrict $ renderText $ treeTemplate tree)
+
+writeNotesToRes :: [Note] -> IO ()
+writeNotesToRes notes = do
   currentDir  <- getCurrentDirectory
   dirContents <- listDirectory currentDir
   if ".res" `elem` dirContents

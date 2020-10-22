@@ -19,6 +19,8 @@ executable micro-synapse
                        Cli.Commands,
                        Builder.Wiki,
                        Builder.Note,
+                       Builder.Tree,
+                       Builder.Templating.Templates
                        Parser.Innerlinks
   main-is:             Main.hs
   default-language:    Haskell2010
@@ -34,4 +36,5 @@ executable micro-synapse
                        attoparsec,
                        fsnotify,
                        lucid,
-                       clay
+                       clay,
+                       containers

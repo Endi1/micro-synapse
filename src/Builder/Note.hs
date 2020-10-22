@@ -1,6 +1,7 @@
 module Builder.Note
   ( Note(..)
   , buildNotes
+  , buildNote
   )
 where
 
@@ -10,7 +11,7 @@ import           Data.Text                      ( Text
 import qualified Data.Text.IO                  as DTIO
 import           CMark                          ( commonmarkToHtml )
 import           System.Directory               ( getCurrentDirectory )
-import           Parser.Innerlinks              ( parseInnerLinks )
+import           Parser.Innerlinks              ( parseInnerLinksToHtml )
 
 data Note = Note {
   title :: Text,
@@ -28,7 +29,7 @@ buildNote notePath = do
   let noteHtml = commonmarkToHtml [] noteRaw
   return $ Note { title = getTitleFromPath notePath
                 , raw   = noteRaw
-                , html  = parseInnerLinks noteHtml
+                , html  = parseInnerLinksToHtml noteHtml
                 }
  where
   getTitleFromPath :: FilePath -> Text
