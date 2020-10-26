@@ -12,6 +12,12 @@ import           Builder.Note
 import           Data.Tree
 import           Data.Text
 
+navBar :: Html ()
+navBar = nav_ [class_ "navbar"] $ do
+  ul_ $ do
+    li_ $ a_ [href_ "/index.html"] "Home"
+    li_ $ a_ [href_ "/tree.html"] "Tree"
+
 noteTemplate :: Note -> Html ()
 noteTemplate note = html_ $ do
   head_ $ do
@@ -19,8 +25,10 @@ noteTemplate note = html_ $ do
     link_ [rel_ "stylesheet", href_ "./style.css"]
   body_ $ do
     div_ [class_ "container"] $ do
-      div_ [class_ "note"] $ do
-        toHtmlRaw $ Builder.Note.html note
+      navBar
+      div_ [class_ "body"] $ do
+        div_ [class_ "note"] $ do
+          toHtmlRaw $ Builder.Note.html note
 
 treeTemplate :: Tree Text -> [Text] -> Html ()
 treeTemplate tree orphans = html_ $ do
@@ -29,15 +37,18 @@ treeTemplate tree orphans = html_ $ do
     link_ [rel_ "stylesheet", href_ "./style.css"]
   body_ $ do
     div_ [class_ "container"] $ do
-      h3_ "Tree"
-      div_ [class_ "tree"] $ do
-        ul_ $ do
-          treeToHtml tree
+      navBar
+      div_ [class_ "body"] $ do
+        h3_ "Tree"
+        div_ [class_ "tree"] $ do
+          ul_ $ do
+            treeToHtml tree
 
-      div_ [class_ "orphans"] $ do
-        h3_ "Orphans"
-        ul_ $ do
-          mapM_ (\o -> li_ $ a_ [href_ (o `append` ".html")] $ toHtml o) orphans
+        div_ [class_ "orphans"] $ do
+          h3_ "Orphans"
+          ul_ $ do
+            mapM_ (\o -> li_ $ a_ [href_ (o `append` ".html")] $ toHtml o)
+                  orphans
 
 
 treeToHtml :: Tree Text -> Html ()

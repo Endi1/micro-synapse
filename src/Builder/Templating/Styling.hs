@@ -21,10 +21,28 @@ successColor = "#97CC04"
 
 containerCss :: Css
 containerCss = ".container" ? do
-  display flex
-  justifyContent center
   marginLeft $ em 15
   marginRight $ em 20
+
+bodyCss :: Css
+bodyCss = ".body" ? do
+  display flex
+  ".center" & do
+    justifyContent center
+
+navCss :: Css
+navCss = ".navbar" ? do
+  display flex
+  justifyContent center
+  background primaryColor
+  ul ? do
+    display flex
+    li ? do
+      marginRight $ em 3
+      a ? do
+        color $ lighten 0.8 primaryColor
+        ":hover" & do
+          color $ lighten 1 primaryColor
 
 pageStyle :: Css
 pageStyle = do
@@ -34,6 +52,8 @@ pageStyle = do
     fontFamily [] [sansSerif]
     background (lighten 0.9 blackColor)
   containerCss
+  bodyCss
+  navCss
   ul ? do
     listStyle none outside none
   a ? do
