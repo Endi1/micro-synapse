@@ -15,7 +15,7 @@ import           Data.Text
 navBar :: Html ()
 navBar = nav_ [class_ "navbar"] $ do
   ul_ $ do
-    li_ $ a_ [href_ "/index.html"] "Home"
+    li_ $ a_ [href_ "/"] "Home"
     li_ $ a_ [href_ "/tree.html"] "Tree"
 
 noteTemplate :: Note -> Html ()

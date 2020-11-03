@@ -27,6 +27,13 @@ containerCss = ".container" ? do
 bodyCss :: Css
 bodyCss = ".body" ? do
   display flex
+  marginTop $ em 1
+  borderColor primaryColor
+  borderStyle solid
+  borderWidth $ em 0.05
+  borderRadius (em 0.3) (em 0.3) (em 0.3) (em 0.3)
+  paddingLeft $ em 1
+  paddingRight $ em 1
   ".center" & do
     justifyContent center
 
@@ -34,28 +41,24 @@ navCss :: Css
 navCss = ".navbar" ? do
   display flex
   justifyContent center
-  background primaryColor
+  borderBottomStyle solid
+  borderWidth $ em 0.01
   ul ? do
+    listStyle none outside none
     display flex
     li ? do
       marginRight $ em 3
-      a ? do
-        color $ lighten 0.8 primaryColor
-        ":hover" & do
-          color $ lighten 1 primaryColor
 
 pageStyle :: Css
 pageStyle = do
   Clay.html ? do
-    color blackColor
+    color $ lighten 0.1 blackColor
     fontSize $ px 20
     fontFamily [] [sansSerif]
     background (lighten 0.9 blackColor)
   containerCss
   bodyCss
   navCss
-  ul ? do
-    listStyle none outside none
   a ? do
     textDecorationLine none
     color primaryColor
