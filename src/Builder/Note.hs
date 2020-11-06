@@ -8,10 +8,9 @@ where
 import           Data.Text                      ( Text
                                                 , pack
                                                 )
-import qualified Data.Text.IO                  as DTIO
 import           CMark                          ( commonmarkToHtml )
-import           System.Directory               ( getCurrentDirectory )
 import           Parser.Innerlinks              ( parseInnerLinksToHtml )
+import           Helpers.Helpers                ( readNoteRaw )
 
 data Note = Note {
   title :: Text,
@@ -24,12 +23,12 @@ buildNotes = mapM buildNote
 
 buildNote :: FilePath -> IO Note
 buildNote notePath = do
-  currentDir <- getCurrentDirectory
-  noteRaw    <- DTIO.readFile (currentDir ++ "/" ++ notePath)
-  let noteHtml = commonmarkToHtml [] noteRaw
+  noteRaw  <- readNoteRaw notePath
+  noteHtml <- parseInnerLinksToHtml $ commonmarkToHtml [] noteRaw
+
   return $ Note { title = getTitleFromPath notePath
                 , raw   = noteRaw
-                , html  = parseInnerLinksToHtml noteHtml
+                , html  = noteHtml
                 }
  where
   getTitleFromPath :: FilePath -> Text
