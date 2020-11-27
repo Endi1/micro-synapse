@@ -1,8 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Web.Server
   ( runServer
   )
 where
 
+import           Data.Text
 import           Happstack.Server               ( serveDirectory
                                                 , logMAccess
                                                 , simpleHTTP
@@ -20,12 +22,13 @@ import           Builder.Wiki                   ( buildWiki )
 import           System.FSNotify                ( watchDir
                                                 , withManager
                                                 , Event
+                                                , eventPath
                                                 )
 
 runServer :: IO ()
 runServer = do
   withManager $ \mgr -> do
-    watchDir mgr "." (const True) filesChanged
+    watchDir mgr "." predicate filesChanged
     putStrLn "Running server on port 3000"
     buildWiki
     simpleHTTP Conf { port        = 3000
@@ -37,4 +40,9 @@ runServer = do
       $ serveDirectory EnableBrowsing ["index.html"] ".res"
 
 filesChanged :: Event -> IO ()
-filesChanged _ = buildWiki
+filesChanged e = do
+  print e
+  buildWiki
+
+predicate :: Event -> Bool
+predicate event = not ("/.res" `isInfixOf` pack (eventPath event))
