@@ -20,10 +20,11 @@ executable micro-synapse
                        Builder.Wiki,
                        Builder.Note,
                        Builder.Tree,
-                       Builder.Templating.Templates
-                       Builder.Templating.Styling
-                       Parser.Innerlinks
-                       Helpers.Helpers
+                       Builder.Templating.Templates,
+                       Builder.Templating.Styling,
+                       Parser.Innerlinks,
+                       Helpers.Helpers,
+                       Paths_micro_synapse
   main-is:             Main.hs
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5,

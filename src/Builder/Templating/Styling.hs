@@ -6,7 +6,6 @@ where
 
 import           Clay
 
-
 primaryColor :: Color
 primaryColor = "#1947BD"
 
@@ -54,7 +53,7 @@ pageStyle = do
   Clay.html ? do
     color $ lighten 0.1 blackColor
     fontSize $ px 20
-    fontFamily [] [sansSerif]
+    fontFamily ["Roboto"] [sansSerif]
     background (lighten 0.9 blackColor)
   containerCss
   bodyCss

@@ -11,6 +11,7 @@ import           System.Directory               ( createDirectory
                                                 )
 import           Data.Text                      ( unpack
                                                 , Text
+                                                , pack
                                                 )
 import           Data.Text.Lazy                 ( toStrict )
 import           Builder.Note                   ( Note(..)
@@ -27,6 +28,8 @@ import           Builder.Templating.Templates   ( noteTemplate
                                                 , treeTemplate
                                                 )
 import           Builder.Templating.Styling     ( pageStyle )
+
+import           Paths_micro_synapse
 
 
 buildWiki :: IO ()
