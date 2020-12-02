@@ -14,6 +14,23 @@ import           Options.Applicative            ( (<**>)
 
 import           Builder.Wiki                   ( buildWiki )
 import           Web.Server                     ( runServer )
+import           System.Random                  ( newStdGen
+                                                , Random(randomRs)
+                                                )
+import           System.IO.Unsafe               ( unsafePerformIO )
+import           Data.Text                      ( Text
+                                                , pack
+                                                , unpack
+                                                )
+import           System.Directory
+
+randomStr :: Text
+randomStr = pack $ take 6 $ randomRs ('a', 'z') $ unsafePerformIO newStdGen
+
+createNoteFile :: Text -> IO ()
+createNoteFile noteTitle = do
+  currentDir <- getCurrentDirectory
+  writeFile (currentDir ++ "/" ++ unpack noteTitle ++ ".md") ""
 
 
 main :: IO ()
@@ -23,7 +40,7 @@ main = exec =<< execParser opts where
 
 
 exec :: Commands -> IO ()
-exec (Commands True "" _    _    ) = putStrLn "Creating note with random title"
-exec (Commands True a  _    _    ) = putStrLn $ "Creating note called " ++ a
+exec (Commands True "" _    _    ) = createNoteFile randomStr
+exec (Commands True a  _    _    ) = createNoteFile $ pack a
 exec (Commands _    _  True False) = buildWiki
 exec (Commands _    _  _    True ) = runServer
