@@ -1,10 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Builder.Templating.Styling
+module Builder.Styling.Style
   ( pageStyle
   )
 where
 
 import           Clay
+import           Builder.Styling.Variables      ( appColors
+                                                , Colors(..)
+                                                )
 
 primaryColor :: Color
 primaryColor = "#1947BD"
@@ -27,12 +30,6 @@ bodyCss :: Css
 bodyCss = ".body" ? do
   display flex
   marginTop $ em 1
-  borderColor primaryColor
-  borderStyle solid
-  borderWidth $ em 0.05
-  borderRadius (em 0.3) (em 0.3) (em 0.3) (em 0.3)
-  paddingLeft $ em 1
-  paddingRight $ em 1
   ".center" & do
     justifyContent center
 
@@ -51,15 +48,15 @@ navCss = ".navbar" ? do
 pageStyle :: Css
 pageStyle = do
   Clay.html ? do
-    color $ lighten 0.1 blackColor
+    color $ primary1 appColors
     fontSize $ px 20
     fontFamily ["Roboto"] [sansSerif]
-    background (lighten 0.9 blackColor)
+    background (primary8 appColors)
   containerCss
   bodyCss
   navCss
   a ? do
-    textDecorationLine none
-    color primaryColor
+    -- textDecorationLine none
+    color $ primary1 appColors
     ":hover" & do
-      color (lighten 0.5 primaryColor)
+      fontWeight bold

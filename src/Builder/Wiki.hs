@@ -27,9 +27,8 @@ import           Clay                           ( render )
 import           Builder.Templating.Templates   ( noteTemplate
                                                 , treeTemplate
                                                 )
-import           Builder.Templating.Styling     ( pageStyle )
+import           Builder.Styling.Style          ( pageStyle )
 
-import           Paths_micro_synapse
 
 
 buildWiki :: IO ()

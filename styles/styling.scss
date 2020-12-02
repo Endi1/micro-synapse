@@ -1,0 +1,122 @@
+.colors {
+  display: flex;
+  margin-top: 1rem;
+}
+.color {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 100%;
+  margin-right: 1em;
+}
+
+$grey-8: #111;
+$grey-7: lighten($grey-8, 15);
+$grey-6: lighten($grey-8, 30);
+$grey-5: lighten($grey-8, 45);
+$grey-4: lighten($grey-8, 60);
+$grey-3: lighten($grey-8, 75);
+$grey-2: lighten($grey-8, 85);
+$grey-1: lighten($grey-8, 90);
+
+.grey-8 {
+  background: $grey-8;
+}
+
+.grey-7 {
+  background: $grey-7;
+}
+
+.grey-6 {
+  background: $grey-6;
+}
+
+.grey-5 {
+  background: $grey-5;
+}
+
+.grey-4 {
+  background: $grey-4;
+}
+
+.grey-3 {
+  background: $grey-3;
+}
+
+.grey-2 {
+  background: $grey-2;
+}
+
+.grey-1 {
+  background: $grey-1;
+}
+
+$primary-8: #222831;
+$primary-7: lighten($primary-8, 15);
+$primary-6: lighten($primary-8, 30);
+$primary-5: lighten($primary-8, 45);
+$primary-4: lighten($primary-8, 55);
+$primary-3: lighten($primary-8, 65);
+$primary-2: lighten($primary-8, 75);
+$primary-1: lighten($primary-8, 80);
+
+.primary-8 {
+  background: $primary-8;
+}
+
+.primary-7 {
+  background: $primary-7;
+}
+
+.primary-6 {
+  background: $primary-6;
+}
+
+.primary-5 {
+  background: $primary-5;
+}
+
+.primary-4 {
+  background: $primary-4;
+}
+
+.primary-3 {
+  background: $primary-3;
+}
+
+.primary-2 {
+  background: $primary-2;
+}
+
+.primary-1 {
+  background: $primary-1;
+}
+
+$success-5: #61b15a;
+$success-4: lighten($success-5, 10);
+$success-3: lighten($success-5, 20);
+$success-2: lighten($success-5, 30);
+$success-1: lighten($success-5, 40);
+
+.success-5 {
+  background: $success-5;
+}
+
+.success-4 {
+  background: $success-4;
+}
+
+.success-3 {
+  background: $success-3;
+}
+
+.success-2 {
+  background: $success-2;
+}
+
+.success-1 {
+  background: $success-1;
+}
+
+body {
+  background-color: $primary-8;
+}

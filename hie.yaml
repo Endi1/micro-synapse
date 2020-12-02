@@ -18,5 +18,20 @@ cradle:
     - path: "./src/Builder.Tree.hs"
       component: "micro-synapse:exe:micro-synapse"
 
+    - path: "./src/Builder.Templating.Templates.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Builder.Styling.Style.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Builder.Styling.Variables.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
     - path: "./src/Parser.Innerlinks.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Helpers.Helpers.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
+    - path: "./src/Paths_micro_synapse.hs"
       component: "micro-synapse:exe:micro-synapse"

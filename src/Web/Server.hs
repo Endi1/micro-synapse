@@ -31,13 +31,17 @@ runServer = do
     watchDir mgr "." predicate filesChanged
     putStrLn "Running server on port 3000"
     buildWiki
-    simpleHTTP Conf { port        = 3000
-                    , validator   = Nothing
-                    , logAccess   = Just logMAccess
-                    , timeout     = 3000
-                    , threadGroup = Nothing
-                    }
-      $ serveDirectory EnableBrowsing ["index.html"] ".res"
+    server
+
+server :: IO ()
+server =
+  simpleHTTP Conf { port        = 3000
+                  , validator   = Nothing
+                  , logAccess   = Just logMAccess
+                  , timeout     = 3000
+                  , threadGroup = Nothing
+                  }
+    $ serveDirectory EnableBrowsing ["index.html"] ".res"
 
 filesChanged :: Event -> IO ()
 filesChanged e = do
