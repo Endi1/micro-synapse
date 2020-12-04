@@ -24,6 +24,7 @@ executable micro-synapse
                        Builder.Styling.Style,
                        Builder.Styling.Variables,
                        Parser.Innerlinks,
+                       Parser.Frontmatter,
                        Helpers.Helpers,
                        Paths_micro_synapse
   main-is:             Main.hs
@@ -34,11 +35,13 @@ executable micro-synapse
                        directory,
                        random,
                        cmark,
+                      --  Delete this
                        yaml,
-                       frontmatter,
+                       bytestring,
                        happstack-server,
                        attoparsec,
                        fsnotify,
                        lucid,
                        clay,
-                       containers
+                       containers,
+                       process

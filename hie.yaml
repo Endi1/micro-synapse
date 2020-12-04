@@ -30,6 +30,9 @@ cradle:
     - path: "./src/Parser.Innerlinks.hs"
       component: "micro-synapse:exe:micro-synapse"
 
+    - path: "./src/Parser.Frontmatter.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
     - path: "./src/Helpers.Helpers.hs"
       component: "micro-synapse:exe:micro-synapse"
 

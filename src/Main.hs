@@ -23,6 +23,8 @@ import           Data.Text                      ( Text
                                                 , unpack
                                                 )
 import           System.Directory
+import           System.Process
+import           Text.Printf
 
 randomStr :: Text
 randomStr = pack $ take 6 $ randomRs ('a', 'z') $ unsafePerformIO newStdGen
@@ -31,6 +33,7 @@ createNoteFile :: Text -> IO ()
 createNoteFile noteTitle = do
   currentDir <- getCurrentDirectory
   writeFile (currentDir ++ "/" ++ unpack noteTitle ++ ".md") ""
+  callCommand $ printf "$EDITOR %s.md" noteTitle
 
 
 main :: IO ()

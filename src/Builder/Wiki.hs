@@ -9,10 +9,7 @@ import           System.Directory               ( createDirectory
                                                 , listDirectory
                                                 , removeDirectoryRecursive
                                                 )
-import           Data.Text                      ( unpack
-                                                , Text
-                                                , pack
-                                                )
+import           Data.Text                      ( Text )
 import           Data.Text.Lazy                 ( toStrict )
 import           Builder.Note                   ( Note(..)
                                                 , buildNotes
@@ -28,6 +25,7 @@ import           Builder.Templating.Templates   ( noteTemplate
                                                 , treeTemplate
                                                 )
 import           Builder.Styling.Style          ( pageStyle )
+import           Text.Printf
 
 
 
@@ -51,11 +49,11 @@ writeNotesToRes notes = do
   currentDir <- getCurrentDirectory
   mapM_
     (\n -> DTIO.writeFile
-      (currentDir ++ "/.res/" ++ unpack (Builder.Note.title n) ++ ".html")
+      (printf "%s/.res/%s.html" currentDir (Builder.Note.filename n))
       (toStrict $ renderText $ noteTemplate n)
     )
     notes
-  DTIO.writeFile (currentDir ++ "/.res/" ++ "style.css")
+  DTIO.writeFile (printf "%s/.res/style.css" currentDir)
                  (toStrict $ render pageStyle)
 
 createRes :: IO ()
