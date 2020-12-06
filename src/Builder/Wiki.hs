@@ -26,16 +26,26 @@ import           Builder.Templating.Templates   ( noteTemplate
                                                 )
 import           Builder.Styling.Style          ( pageStyle )
 import           Text.Printf
-
+import           CMark                          ( commonmarkToHtml )
+import           Parser.Innerlinks              ( parseInnerLinksToHtml )
+import           Builder.Types                  ( NoteAndHTML
+                                                , NoteHTML
+                                                )
 
 
 buildWiki :: IO ()
 buildWiki = do
   markdownFiles <- getMarkdownFiles =<< getCurrentDirectory
   notes         <- buildNotes markdownFiles
-  tree          <- buildTree notes
+  notesRendered <- mapM
+    (\n -> do
+      noteHTML <- renderNoteHTML (raw n) notes
+      return (n, noteHTML)
+    )
+    notes
+  tree <- buildTree notes
   createRes
-  writeNotesToRes notes
+  writeNotesToRes notesRendered
   writeTreeToRes tree (getOrphans tree notes)
 
 writeTreeToRes :: Tree Text -> [Text] -> IO ()
@@ -44,17 +54,21 @@ writeTreeToRes tree orphans = do
   DTIO.writeFile (currentDir ++ "/.res/" ++ "tree.html")
                  (toStrict $ renderText $ treeTemplate tree orphans)
 
-writeNotesToRes :: [Note] -> IO ()
-writeNotesToRes notes = do
+writeNotesToRes :: [NoteAndHTML] -> IO ()
+writeNotesToRes notesRendered = do
   currentDir <- getCurrentDirectory
-  mapM_
-    (\n -> DTIO.writeFile
-      (printf "%s/.res/%s.html" currentDir (Builder.Note.filename n))
-      (toStrict $ renderText $ noteTemplate n)
-    )
-    notes
-  DTIO.writeFile (printf "%s/.res/style.css" currentDir)
-                 (toStrict $ render pageStyle)
+  mapM_ writeNoteToRes notesRendered
+
+
+writeNoteToRes :: NoteAndHTML -> IO ()
+writeNoteToRes (note, noteHTML) = do
+  currentDir <- getCurrentDirectory
+  DTIO.writeFile
+    (printf "%s/.res/%s.html" currentDir (Builder.Note.identifier note))
+    (toStrict $ renderText $ noteTemplate note noteHTML)
+
+renderNoteHTML :: Text -> [Note] -> IO NoteHTML
+renderNoteHTML noteRaw = parseInnerLinksToHtml $ commonmarkToHtml [] noteRaw
 
 createRes :: IO ()
 createRes = do
@@ -65,6 +79,8 @@ createRes = do
       removeDirectoryRecursive (currentDir ++ "/.res")
       createDirectory (currentDir ++ "/.res")
     else createDirectory (currentDir ++ "/.res")
+  DTIO.writeFile (printf "%s/.res/style.css" currentDir)
+                 (toStrict $ render pageStyle)
 
 getMarkdownFiles :: FilePath -> IO [FilePath]
 getMarkdownFiles currentDir = Prelude.filter isMarkdownFile

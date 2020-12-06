@@ -35,17 +35,17 @@ navBar = nav_ [class_ "navbar"] $ do
     li_ $ a_ [href_ "/"] "Home"
     li_ $ a_ [href_ "/tree.html"] "Tree"
 
-noteTemplate :: Note -> Html ()
-noteTemplate note = doctypehtml_ $ html_ $ do
+noteTemplate :: Note -> Text -> Html ()
+noteTemplate note noteHTML = doctypehtml_ $ html_ $ do
   head_ $ do
     commonHeadElements
-    title_ "Endi's Wiki"
+    title_ $ toHtml $ Builder.Note.title note
   body_ $ do
     div_ [class_ "container"] $ do
       navBar
       div_ [class_ "body"] $ do
         div_ [class_ "note"] $ do
-          toHtmlRaw $ Builder.Note.html note
+          toHtmlRaw noteHTML
 
 treeTemplate :: Tree Text -> [Text] -> Html ()
 treeTemplate tree orphans = doctypehtml_ $ html_ $ do

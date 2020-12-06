@@ -13,30 +13,31 @@ import           Data.Text                      ( Text
 import qualified Data.Attoparsec.Text          as A
 import           Text.Printf                    ( printf )
 import           Options.Applicative            ( Alternative((<|>)) )
-import           Helpers.Helpers
+import           Builder.Note
+import           Builder.Types
 
 parseInnerLinks :: Text -> [Text]
 parseInnerLinks noteRaw =
-  let parseResult = A.parseOnly (A.many1 parseLinks) noteRaw
-  in  case parseResult of
-        Left  _           -> []
-        Right linkSymbols -> linkSymbols
+  let filenameInLinksParseResult = A.parseOnly (A.many1 parseLinks) noteRaw
+  in  case filenameInLinksParseResult of
+        Left  _         -> []
+        Right filenames -> filenames
 
-parseInnerLinksToHtml :: Text -> IO Text
-parseInnerLinksToHtml noteHtml =
-  let parseResult = A.parseOnly (A.many1 parseLinks) noteHtml
-  in  case parseResult of
-        Left  _           -> return noteHtml
-        Right linkSymbols -> replaceLinks linkSymbols noteHtml
+parseInnerLinksToHtml :: NoteHTML -> [Note] -> IO Text
+parseInnerLinksToHtml noteHtml allNotes =
+  let filenameInLinksParseResult = A.parseOnly (A.many1 parseLinks) noteHtml
+  in  case filenameInLinksParseResult of
+        Left  _               -> return noteHtml
+        Right filenameInLinks -> replaceLinks filenameInLinks noteHtml allNotes
  where
-  replaceLinks :: [Text] -> Text -> IO Text
-  replaceLinks []       noteHtml = return noteHtml
-  replaceLinks (x : xs) noteHtml = do
-    noteRaw <- readNoteRaw (unpack x ++ ".md")
-    let titleParseResult = A.parseOnly parseTitle noteRaw
-    case titleParseResult of
-      Left  _     -> replaceLinks xs $ replaceLink x x noteHtml
-      Right title -> replaceLinks xs $ replaceLink x title noteHtml
+  replaceLinks :: [Text] -> Text -> [Note] -> IO Text
+  replaceLinks []       noteHtml _        = return noteHtml
+  replaceLinks (x : xs) noteHtml allNotes = do
+    let noteWithFileName = findNote x allNotes
+    case noteWithFileName of
+      Nothing -> replaceLinks xs (replaceLink x x noteHtml) allNotes
+      Just note ->
+        replaceLinks xs (replaceLink x (title note) noteHtml) allNotes
 
   replaceLink :: Text -> Text -> Text -> Text
   replaceLink filename title = replace

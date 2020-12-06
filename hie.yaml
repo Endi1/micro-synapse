@@ -18,6 +18,9 @@ cradle:
     - path: "./src/Builder.Tree.hs"
       component: "micro-synapse:exe:micro-synapse"
 
+    - path: "./src/Builder.Types.hs"
+      component: "micro-synapse:exe:micro-synapse"
+
     - path: "./src/Builder.Templating.Templates.hs"
       component: "micro-synapse:exe:micro-synapse"
 

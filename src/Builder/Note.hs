@@ -5,16 +5,14 @@ module Builder.Note
   , buildNote
   , FrontmatterParseResult
   , NoteFrontmatter
+  , findNote
   )
 where
 
 import           Data.Text                      ( Text
                                                 , pack
                                                 )
-import           CMark                          ( commonmarkToHtml )
-import           Parser.Innerlinks              ( parseInnerLinksToHtml )
 import           Helpers.Helpers                ( readNoteRaw )
-import           GHC.Generics
 import           Data.Yaml
 import           Parser.Frontmatter
 import           Data.Maybe
@@ -30,8 +28,8 @@ data Note = Note {
   title :: Text,
   filename :: FilePath,
   raw :: Text,
-  html :: Text,
-  tags :: [Text]
+  tags :: [Text],
+  identifier :: Text
 } deriving Show
 
 buildNotes :: [FilePath] -> IO [Note]
@@ -39,14 +37,13 @@ buildNotes = mapM buildNote
 
 buildNote :: FilePath -> IO Note
 buildNote notePath = do
-  noteRaw  <- readNoteRaw notePath
-  noteHtml <- parseInnerLinksToHtml $ commonmarkToHtml [] noteRaw
+  noteRaw <- readNoteRaw notePath
   let fm = parseFrontmatterEither noteRaw :: FrontmatterParseResult
-  return $ Note { title    = getNoteTitle notePath fm
-                , raw      = noteRaw
-                , filename = notePath
-                , html     = noteHtml
-                , tags     = getNoteTags fm
+  return $ Note { title      = getNoteTitle notePath fm
+                , raw        = noteRaw
+                , filename   = notePath
+                , tags       = getNoteTags fm
+                , identifier = getTitleFromPath notePath
                 }
 
 getTitleFromPath :: FilePath -> Text
@@ -61,3 +58,10 @@ getNoteTags :: FrontmatterParseResult -> [Text]
 getNoteTags fm = case fm of
   Left  _ -> []
   Right a -> fromMaybe [] (tags' a)
+
+findNote :: Text -> [Note] -> Maybe Note
+findNote needle haystack =
+  let filterResult = filter (\n -> identifier n == needle) haystack
+  in  case filterResult of
+        []      -> Nothing
+        (a : _) -> Just a

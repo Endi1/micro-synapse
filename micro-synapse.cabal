@@ -20,6 +20,7 @@ executable micro-synapse
                        Builder.Wiki,
                        Builder.Note,
                        Builder.Tree,
+                       Builder.Types,
                        Builder.Templating.Templates,
                        Builder.Styling.Style,
                        Builder.Styling.Variables,
