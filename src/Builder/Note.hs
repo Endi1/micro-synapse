@@ -16,6 +16,7 @@ import           Helpers.Helpers                ( readNoteRaw )
 import           Data.Yaml
 import           Parser.Frontmatter
 import           Data.Maybe
+import           Data.Either
 
 data NoteFrontmatter = NoteFrontmatter {title' :: Maybe Text, tags' :: Maybe [Text]} deriving (Show)
 
@@ -38,9 +39,10 @@ buildNotes = mapM buildNote
 buildNote :: FilePath -> IO Note
 buildNote notePath = do
   noteRaw <- readNoteRaw notePath
-  let fm = parseFrontmatterEither noteRaw :: FrontmatterParseResult
+  let fm          = parseFrontmatterEither noteRaw :: FrontmatterParseResult
+      pageContent = parseRestOfPageEither noteRaw
   return $ Note { title      = getNoteTitle notePath fm
-                , raw        = noteRaw
+                , raw        = fromRight noteRaw pageContent
                 , filename   = notePath
                 , tags       = getNoteTags fm
                 , identifier = getTitleFromPath notePath
